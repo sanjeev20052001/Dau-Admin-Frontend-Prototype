@@ -1,0 +1,24 @@
+$defaultmargin: 5px;
+$defaultFilterWidth: 18rem;
+.card{
+    align-items: center;
+    border-style: hidden;
+}
+.text{
+    margin: $defaultmargin;
+    width: $defaultFilterWidth;
+}
+.table{
+    padding: 0px;
+}
+.button{
+    margin: $defaultmargin;
+    width: $defaultFilterWidth;
+}
+.filters {
+padding-top: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  width: auto;
+}
