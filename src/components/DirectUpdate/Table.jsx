@@ -4,13 +4,13 @@ import { Column } from "primereact/column";
 import { useState } from "react";
 import { useSelector } from 'react-redux';
 import { InputText } from "primereact/inputtext";
+import '../../styles/OrderList.scss'
 
 
 const Table = () => {
 
-  //const [expandedRows, setExpandedRows] = useState();
-  //const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState(null);
+  const [expandedRows, setExpandedRows] = useState();
+  const [tableData, setTableData] = useState(null);
 
   const {filteredData} = useSelector((state) => state.filter);
 
@@ -35,35 +35,60 @@ const Table = () => {
     { field: 'summation', header: 'Summation' }
   ];
 
+  const chargeColumns = [
+    { field: 'charge_id', header: 'Charge Id' },
+    { field: 'charge_name', header: 'Charge Name' },
+    { field: 'charge_cost', header: 'Charge' },
+    { field: 'charge_basis', header: 'Basis' },
+    { field: 'charge_currency', header: 'Currency' }
+  ]
+
   useEffect(() => {
-    setProducts(filteredData)
+    setTableData(filteredData)
   }, [filteredData]);
 
   const onCellEditComplete = (e) => {
     let { rowData, newValue, field, originalEvent: event } = e;
-    if (newValue.trim().length > 0)
+    if (newValue.trim().length >= 0)
       rowData[field] = newValue;
     else
       event.preventDefault();
-    }
-
-  const cellEditor = (options) => {
-    return textEditor(options);
   }
 
   const textEditor = (options) => {
     return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
-}
+  }
+
+  const rowExpansionTemplate = (tableData) => {
+    return (
+      <div className="chargTable">
+        <DataTable
+          value={tableData.data.charges}
+          resizableColumns
+          showGridlines
+          dataKey="_id"
+          emptyMessage="No data found."
+          className="editable-cells-table"
+          editMode="cell"
+        >
+          {  
+            chargeColumns.map(({ field, header }) => {
+              return <Column key={field} field={field} header={header} align={"center"} style={{ width: '25%'}} 
+                editor={(options) => textEditor(options)} onCellEditComplete={onCellEditComplete} />
+            })
+          }
+        </DataTable>
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="card">
         <DataTable
-          value={products}
+          value={tableData}
           resizableColumns
-          //columnResizeMode="expand"
           showGridlines
-          //responsiveLayout="scroll"
           paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
           dataKey="_id"
           paginator
@@ -71,170 +96,20 @@ const Table = () => {
           className="editable-cells-table"
           currentPageReportTemplate="Showing {first} to {last} of {totalRecords} posts"
           rows={20}
-          removableSort
           editMode="cell"
-          scrollHeight="680px" 
+          scrollHeight="680px"
+          expandedRows={expandedRows} 
+          onRowToggle={(e) => setExpandedRows(e.data)}
+          rowExpansionTemplate={rowExpansionTemplate}
         >
 
-          <Column expander />
+          <Column expander style={{ width: '3em' }} />
           {  
             columns.map(({ field, header }) => {
               return <Column key={field} field={field} header={header} align={"center"} style={{ width: '25%'}} 
-                editor={(options) => cellEditor(options)} onCellEditComplete={onCellEditComplete} />
+                editor={(options) => textEditor(options)} onCellEditComplete={onCellEditComplete} />
             })
           }
-
-          {/* <Column
-            field="meta.origin_port"
-            // editMode="row"
-            header="Origin Port"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            
-            style={{ textAlign: "center" }}
-            // sortable
-          />
-          <Column
-            field="meta.destination_port"
-            header="Destination Port"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          />
-          <Column
-            field="data.via_pol"
-            header="Via Port"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="meta.load_type"
-            header="Load Type"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.contract_number"
-            header="Contract Number"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.transit_time"
-            header="Transit Time"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="other_charges"
-            header="Other Charges"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.service_type"
-            header="Service Type"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.inclusions"
-            header="Inclusions"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.if_pplicable_charges"
-            header="If Applicable Charges"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.remarks"
-            header="Remarks"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="meta.start_date"
-            header="Start Date"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.expiry"
-            header="Expiry Date"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.via_pol"
-            header="Via Pol"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.via_pod"
-            header="Via Pod"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.cargo_type"
-            header="Cargo Type"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="data.commodity"
-            header="Commodities"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            field="summation"
-            header="Summation"
-            editor={(options) => textEditor(options)}
-            align={"center"}
-            style={{ textAlign: "center" }}
-            // sortable
-          ></Column>
-          <Column
-            rowEditor
-            headerStyle={{ width: "10%", minWidth: "8rem" }}
-            bodyStyle={{ textAlign: "center" }}
-          ></Column> */}
         </DataTable>
       </div>
     </div>
