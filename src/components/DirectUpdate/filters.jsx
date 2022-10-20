@@ -1,31 +1,33 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
 import { Calendar } from 'primereact/calendar';
 import { Button } from 'primereact/button';
 import '../../styles/dropDownDemo.scss';
-//import { legs,vendors,liners,originPorts,destPorts,cargoType,chargeName,loadType } from '../../data';
+//import { cargoType,loadType } from '../../data';
 import { useDispatch,useSelector } from 'react-redux';
-import useDebounce from '../../hooks/useDebounce';
-import useUpdateEffect from '../../hooks/useUpdateEffect';
-import { getLeg,getVendor,getLiner,getOriginPort,getDestPort,getCargoType,getChargeName,getLoadType,getAllFilters } from '../../actions/DirectUpdate/filterAction';
+// import useDebounce from '../../hooks/useDebounce';
+// import useUpdateEffect from '../../hooks/useUpdateEffect';
+import { getLVL,getOriginPort,getDestPort,getCargoType,getChargeName,getLoadType } from '../../actions/DirectUpdate/filterAction';
 import { getAllFilteredData } from '../../actions/DirectUpdate/tableActios';
+
+let ctr = 0;
+let disableCtr = 0;
+let filterCtr = 0;
+let prevBatchCode=null;
+
 
 const DropdownDemo = () => {
 
     const dispatch = useDispatch();
 
-    const {leg} = useSelector((state) => state.leg);
-    const {vendor} = useSelector((state) => state.vendor);
-    const {liner} = useSelector((state) => state.liner);
+    const {lvl} = useSelector((state) => state.lvl);
     const {origin} = useSelector((state) => state.origin);
     const {destination} = useSelector((state) => state.destination);
     const {cargo} = useSelector((state) => state.cargoType);
     const {charge} = useSelector((state) => state.chargeName);
     const {load} = useSelector((state) => state.loadType);
-    const {filters} = useSelector((state) => state.filters)
-    //console.log(filters[0]);
 
     const [selectedLeg, setSelectedLeg] = useState(null);
     const [selectedVendor, setSelectedVendor] = useState(null);
@@ -37,30 +39,29 @@ const DropdownDemo = () => {
     const [selectedLoadType, setSelectedLoadType] = useState(null);
 
     const [batchCode, setBatchCode] = useState('');
-    const batchCodeDebounceValue = useDebounce(batchCode);
-    const [date1, setDate1] = useState(null);
-    const [date2, setDate2] = useState(null);
-
-    useUpdateEffect(() => {
-        dispatch(getLeg(batchCode));
-        dispatch(getVendor(batchCode));
-        dispatch(getLiner(batchCode));
-        dispatch(getOriginPort(batchCode));
-        dispatch(getDestPort(batchCode));
-        dispatch(getCargoType(batchCode));
-        dispatch(getChargeName(batchCode));
-        dispatch(getLoadType(batchCode));
-        //dispatch(getAllFilters(batchCode));
-        
-    }, [batchCodeDebounceValue]);
-
+    const [startDate, setStartDate] = useState(null);
+    const [expiryDate, setExpiryDate] = useState(null);
     const filterSubmit = () => {
-        dispatch(getAllFilteredData(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType));
+        if(batchCode.length!==0 && batchCode!==prevBatchCode)
+        {
+            dispatch(getLVL(batchCode));
+            dispatch(getOriginPort(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType));
+            dispatch(getDestPort(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType));
+            dispatch(getCargoType(batchCode));
+            dispatch(getChargeName(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType));
+            dispatch(getLoadType(batchCode));
+            prevBatchCode=batchCode;
+            console.log(prevBatchCode);
+            ctr=1;
+        }
+        else if(batchCode.length!==0)
+        {
+            dispatch(getAllFilteredData(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, startDate, expiryDate, selectedCargoType, selectedChargeName, selectedLoadType));
+        }
     }
 
-
-    const onLegChange = (e) => {
-        setSelectedLeg(e.value);
+    const onLegChange = (props) => {
+        setSelectedLeg(props.options[0].leg);
     }
     const onVendorChange = (e) => {
         setSelectedVendor(e.value);
@@ -84,11 +85,11 @@ const DropdownDemo = () => {
         setSelectedLoadType(e.value);
     }
 
-    const selectedLegTemplate = (option, props) => {
-        if (option) {
+    const selectedLegTemplate = (options, props) => {
+        if (props.options!==null) {
             return (
                 <div>
-                    {option._id}
+                    {props.options[0].leg}
                 </div>
             );
         }
@@ -100,10 +101,10 @@ const DropdownDemo = () => {
         );
     }
     const selectedVendorTemplate = (option, props) => {
-        if (option) {
+        if (props.options!==null) {
             return (
                 <div>
-                    {option._id}
+                    {props.options[0].vendor}
                 </div>
             );
         }
@@ -115,10 +116,10 @@ const DropdownDemo = () => {
         );
     }
     const selectedLinerTemplate = (option, props) => {
-        if (option) {
+        if (props.options!==null) {
             return (
                 <div>
-                    {option._id}
+                    {props.options[0].liner}
                 </div>
             );
         }
@@ -133,7 +134,7 @@ const DropdownDemo = () => {
         if (option) {
             return (
                 <div>
-                    {option._id}
+                    {option.origin}
                 </div>
             );
         }
@@ -148,7 +149,7 @@ const DropdownDemo = () => {
         if (option) {
             return (
                 <div>
-                    {option._id}
+                    {option.destination}
                 </div>
             );
         }
@@ -163,7 +164,7 @@ const DropdownDemo = () => {
         if (option) {
             return (
                 <div>
-                    {option._id}
+                    {option.charge}
                 </div>
             );
         }
@@ -178,7 +179,7 @@ const DropdownDemo = () => {
         if (option) {
             return (
                 <div>
-                    {option._id}
+                    {option.name}
                 </div>
             );
         }
@@ -193,7 +194,7 @@ const DropdownDemo = () => {
         if (option) {
             return (
                 <div>
-                    {option._id}
+                    {option.name}
                 </div>
             );
         }
@@ -206,98 +207,108 @@ const DropdownDemo = () => {
     }
 
     
-    const LegOptionTemplate = (option) => {
+    const LegOptionTemplate = (props) => {
         return (
             <div>
-                {option._id}
+                {props.options[0].leg}
             </div>
         );
     }
-    const VendorOptionTemplate = (option) => {
+    const VendorOptionTemplate = (props) => {
         return (
             <div>
-                {option._id}
+                {props.options[0].vendor}
             </div>
         );
     }
-    const LinerOptionTemplate = (option) => {
+    const LinerOptionTemplate = (props) => {
         return (
             <div>
-                {option._id}
+                {props.options[0].liner}
             </div>
         );
     }
     const OriginPortOptionTemplate = (option) => {
         return (
             <div>
-                {option._id}
+                {option.origin}
             </div>
         );
     }
     const DestPortOptionTemplate = (option) => {
         return (
             <div>
-                {option._id}
+                {option.destination}
             </div>
         );
     }
     const ChargeNameOptionTemplate = (option) => {
         return (
             <div>
-                {option._id}
+                {option.charge}
             </div>
         );
     }
     const CargoTypeOptionTemplate = (option) => {
         return (
             <div>
-                {option._id}
+                {option.name}
             </div>
         );
     }
     const LoadTypeOptionTemplate = (option) => {
         return (
             <div>
-                {option._id}
+                {option.name}
             </div>
         );
     }
-    //const batchCode="6U3FFyhM1yBX1yiUGBRLlqtC7PPHMKGWC5sIxQlG";
+
+        if( lvl && origin.length!==0 && destination.length!==0 && charge.length!==0 && batchCode.length!==0)
+        {
+            if(filterCtr===0 || batchCode!==prevBatchCode)
+            {
+                dispatch(getAllFilteredData(batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, startDate, expiryDate, selectedCargoType, selectedChargeName, selectedLoadType));
+                filterCtr=1;
+            }
+            disableCtr=1;
+        }
+
     
     return (
         <div>
             <div className="filters">
                 <InputText className="text" value={batchCode} onChange={(e) => setBatchCode(e.target.value)} placeholder='Batch Code' />
 
-                <Dropdown className='text' value={selectedLeg} options={leg} onChange={onLegChange} optionLabel="_id" optionValue='_id' filter filterBy="_id" showClear placeholder="Leg"
-                     valueTemplate={selectedLegTemplate} itemTemplate={LegOptionTemplate} disabled={!batchCode} />
+                <Dropdown className='text' value={selectedLeg} options={lvl.leg} onChange={onLegChange} optionLabel="leg" optionValue='leg' filter filterBy="leg" showClear placeholder="Leg"
+                     valueTemplate={selectedLegTemplate} itemTemplate={LegOptionTemplate} disabled/>
 
-                <Dropdown className='text' value={selectedVendor} options={vendor} onChange={onVendorChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Vendor"
-                    valueTemplate={selectedVendorTemplate} itemTemplate={VendorOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedVendor} options={lvl.vendor} onChange={onVendorChange} optionLabel="vendor" optionValue='vendor' filter showClear filterBy="vendor" placeholder="Vendor"
+                    valueTemplate={selectedVendorTemplate} itemTemplate={VendorOptionTemplate} disabled/>
 
-                <Dropdown className='text' value={selectedLiner} options={liner} onChange={onLinerChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Liner"
-                    valueTemplate={selectedLinerTemplate} itemTemplate={LinerOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedLiner} options={lvl.liner} onChange={onLinerChange} optionLabel="liner" optionValue='liner' filter showClear filterBy="liner" placeholder="Liner"
+                    valueTemplate={selectedLinerTemplate} itemTemplate={LinerOptionTemplate} disabled/>
                 
-                <Dropdown className='text' value={selectedOriginPort} options={origin} onChange={onOriginPortChange} optionLabel="_id" optionValue='_id' filter showClear placeholder="Origin Port"
-                    valueTemplate={selectedOriginPortTemplate} itemTemplate={OriginPortOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedOriginPort} options={origin} onChange={onOriginPortChange} optionLabel="origin" optionValue='origin' filter showClear filterBy="origin" placeholder="Origin Port"
+                    valueTemplate={selectedOriginPortTemplate} itemTemplate={OriginPortOptionTemplate} virtualScrollerOptions={{itemSize:50 }} disabled={disableCtr===0}/>
                 
-                <Dropdown className='text' value={selectedDestinationPort} options={destination} onChange={onDestPortChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Destination Port"
-                    valueTemplate={selectedDestPortTemplate} itemTemplate={DestPortOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedDestinationPort} options={destination} onChange={onDestPortChange} optionLabel="destination" optionValue='destination' filter showClear filterBy="destination" placeholder="Destination Port"
+                    valueTemplate={selectedDestPortTemplate} itemTemplate={DestPortOptionTemplate} virtualScrollerOptions={{itemSize:50 }} disabled={disableCtr===0}/>
 
-                <Calendar className='text' id="basic" value={date1} onChange={(e) => setDate1(e.value)} placeholder='Start Date' disabled={!batchCode}/>
+                <Calendar className='text' dateFormat='dd/mm/yy' id="basic" value={startDate} onChange={(e) => setStartDate(e.value)} placeholder='Start Date' disabled={disableCtr===0}/>
+        
+                <Calendar className='text' dateFormat='dd/mm/yy' id="basic" value={expiryDate} onChange={(e) => setExpiryDate(e.value)} placeholder='Expiry Date' disabled={disableCtr===0}/>
 
-                <Calendar className='text' id="basic" value={date2} onChange={(e) => setDate2(e.value)} placeholder='Expiry Date' disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedCargoType} options={cargo} onChange={onCargoTypeChange} optionLabel="name" optionValue='name' filter showClear filterBy="name" placeholder="Cargo Type"
+                    valueTemplate={selectedCargoTypeTemplate} itemTemplate={CargoTypeOptionTemplate} disabled={disableCtr===0}/>
 
-                <Dropdown className='text' value={selectedCargoType} options={cargo} onChange={onCargoTypeChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Cargo Type"
-                    valueTemplate={selectedCargoTypeTemplate} itemTemplate={CargoTypeOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedChargeName} options={charge} onChange={onChargeNameChange} optionLabel="charge" optionValue='charge' filter showClear filterBy="charge" placeholder="Charge Name"
+                    valueTemplate={selectedChargeNameTemplate} itemTemplate={ChargeNameOptionTemplate} disabled={disableCtr===0}/>
 
-                <Dropdown className='text' value={selectedChargeName} options={charge} onChange={onChargeNameChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Charge Name"
-                    valueTemplate={selectedChargeNameTemplate} itemTemplate={ChargeNameOptionTemplate} disabled={!batchCode}/>
+                <Dropdown className='text' value={selectedLoadType} options={load} onChange={onLoadTypeChange} optionLabel="name" optionValue='name' filter showClear filterBy="name" placeholder="Load Type"
+                    valueTemplate={selectedLoadTypeTemplate} itemTemplate={LoadTypeOptionTemplate} disabled={disableCtr===0}/>
 
-                <Dropdown className='text' value={selectedLoadType} options={load} onChange={onLoadTypeChange} optionLabel="_id" optionValue='_id' filter showClear filterBy="_id" placeholder="Load Type"
-                    valueTemplate={selectedLoadTypeTemplate} itemTemplate={LoadTypeOptionTemplate} disabled={!batchCode}/>
-
-                <Button className='button' label="Submit" aria-label="Submit" disabled={!batchCode} onClick={filterSubmit}/>
+                <Button className='button' label="Submit" aria-label="Submit" onClick={filterSubmit}/>
             </div>
         </div>
     );

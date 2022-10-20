@@ -1,6 +1,5 @@
 .card {
   align-items: center;
-  border-style: hidden;
 }
 
 .text {
@@ -9,7 +8,7 @@
 }
 
 .table {
-  padding: 0px;
+  overflow-x: scroll;
 }
 
 .button {

@@ -14,7 +14,7 @@ export const filterReducer = ( state={filteredData:[]},action ) => {
 export const singleFieldUpdateReducer = ( state={filteredData:[]},action ) => {
     switch(action.type)
     {
-        case FETCH_ALL_FILTERS:
+        case UPDATE_SINGLE_FIELD:
             console.log(action.payload);
             return {...state,filteredData:action.payload};
         default:

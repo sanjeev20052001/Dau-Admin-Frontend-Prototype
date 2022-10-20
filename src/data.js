@@ -43,16 +43,20 @@ export const destPorts = [
     { name: 'SGSEM'},
     { name: 'JPABT'}
 ];
-export const cargoType = [];
+export const CargoType = [
+  { name: 'Perishable'},
+  { name: 'Hazardous'}
+];
 export const chargeName = [
     { name: 'Basic Freight Charge'},
     { name: 'Port Charge'},
     { name: 'Sub Charge'},
     { name: 'Waiting Charge'}
 ];
-export const loadType = [
+export const LoadType = [
     { name: '20GP'},
-    { name: '40GP'}
+    { name: '40GP'},
+    { name: '60GP'}
 ];
 export const data = [
     {

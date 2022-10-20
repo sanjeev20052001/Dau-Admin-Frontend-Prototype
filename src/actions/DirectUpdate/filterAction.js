@@ -1,42 +1,21 @@
-//import { data } from "../data";
-import { FETCH_ALL_LEG,FETCH_ALL_CARGO_TYPE, FETCH_ALL_CHARGE_NAME, FETCH_ALL_DESTINATION, FETCH_ALL_LINER, FETCH_ALL_LOAD_TYPE, FETCH_ALL_ORIGIN, FETCH_ALL_VENDOR,FETCH_ALL_FILTERS } from "../../constants/DirectUpdate/filterConstants";
+import { CargoType,LoadType } from "../../data";
+import { FETCH_ALL_LVL, FETCH_ALL_CARGO_TYPE, FETCH_ALL_CHARGE_NAME, FETCH_ALL_DESTINATION, FETCH_ALL_LOAD_TYPE, FETCH_ALL_ORIGIN } from "../../constants/DirectUpdate/filterConstants";
 import axios from 'axios';
 
 const url = 'http://localhost:5000'
 
-export const getLeg = (batchCode) => async (dispatch) => {
+export const getLVL= (batchCode) => async (dispatch) => {
     try {
-      const leg = await axios.get(`${url}/leg?batchcode=${batchCode}`);
-      // dispatch(getVendor(batchCode));
-      dispatch({ type: FETCH_ALL_LEG, payload: leg.data });
+      const lvl = await axios.get(`${url}/lvl?data.batchcode=${batchCode}`);
+      dispatch({ type: FETCH_ALL_LVL, payload: lvl.data });
     } catch (error) {
       console.log(error.message);
     }
 };
 
-export const getVendor = (batchCode) => async (dispatch) => {
+export const getOriginPort = (batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType) => async (dispatch) => {
   try {
-    const vendor = await axios.get(`${url}/vendor?batchcode=${batchCode}`);
-    // dispatch(getLiner(batchCode));
-    dispatch({ type: FETCH_ALL_VENDOR, payload: vendor.data });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-export const getLiner = (batchCode) => async (dispatch) => {
-  try {
-    const liner = await axios.get(`${url}/liner?batchcode=${batchCode}`);
-    // dispatch(getOriginPort(batchCode));
-    dispatch({ type: FETCH_ALL_LINER, payload: liner.data });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-export const getOriginPort = (batchCode) => async (dispatch) => {
-  try {
-    const origin = await axios.get(`${url}/origin?batchcode=${batchCode}`);
+    const origin = await axios.get(`${url}/origin?data.batchcode=${batchCode}&data.leg_code=${selectedLeg}&data.vendor.vendor_name=${selectedVendor}&data.sub_vendor.sub_vendor_name=${selectedLiner}&meta.origin_port=${selectedOriginPort}&meta.destination_port=${selectedDestinationPort}&data.cargo_type=${selectedCargoType}&data.charges.charge_name=${selectedChargeName}&meta.load_type=${selectedLoadType}`);
     // dispatch(getDestPort(batchCode));
     dispatch({ type: FETCH_ALL_ORIGIN, payload: origin.data });
   } catch (error) {
@@ -44,9 +23,9 @@ export const getOriginPort = (batchCode) => async (dispatch) => {
   }
 };
 
-export const getDestPort = (batchCode) => async (dispatch) => {
+export const getDestPort = (batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType) => async (dispatch) => {
   try {
-    const destination = await axios.get(`${url}/destination?batchcode=${batchCode}`);
+    const destination = await axios.get(`${url}/destination?data.batchcode=${batchCode}&data.leg_code=${selectedLeg}&data.vendor.vendor_name=${selectedVendor}&data.sub_vendor.sub_vendor_name=${selectedLiner}&meta.origin_port=${selectedOriginPort}&meta.destination_port=${selectedDestinationPort}&data.cargo_type=${selectedCargoType}&data.charges.charge_name=${selectedChargeName}&meta.load_type=${selectedLoadType}`);
     // dispatch(getCargoType(batchCode));
     dispatch({ type: FETCH_ALL_DESTINATION, payload: destination.data });
   } catch (error) {
@@ -54,19 +33,19 @@ export const getDestPort = (batchCode) => async (dispatch) => {
   }
 };
 
-export const getCargoType = (batchCode) => async (dispatch) => {
+export const getCargoType = (batchCode) => (dispatch) => {
   try {
-    const cargoType = await axios.get(`${url}/cargo?batchcode=${batchCode}`);
+    const cargoType = CargoType;
     // dispatch(getChargeName(batchCode));
-    dispatch({ type: FETCH_ALL_CARGO_TYPE, payload: cargoType.data });
+    dispatch({ type: FETCH_ALL_CARGO_TYPE, payload: cargoType });
   } catch (error) {
     console.log(error.message);
   }
 };
 
-export const getChargeName = (batchCode) => async (dispatch) => {
+export const getChargeName = (batchCode, selectedLeg, selectedVendor, selectedLiner, selectedOriginPort, selectedDestinationPort, selectedCargoType, selectedChargeName, selectedLoadType) => async (dispatch) => {
   try {
-    const chargeName = await axios.get(`${url}/charge?batchcode=${batchCode}`);
+    const chargeName = await axios.get(`${url}/charge?data.batchcode=${batchCode}&data.leg_code=${selectedLeg}&data.vendor.vendor_name=${selectedVendor}&data.sub_vendor.sub_vendor_name=${selectedLiner}&meta.origin_port=${selectedOriginPort}&meta.destination_port=${selectedDestinationPort}&data.cargo_type=${selectedCargoType}&data.charges.charge_name=${selectedChargeName}&meta.load_type=${selectedLoadType}`);
     // dispatch(getLoadType(batchCode));
     dispatch({ type: FETCH_ALL_CHARGE_NAME, payload: chargeName.data });
   } catch (error) {
@@ -76,17 +55,8 @@ export const getChargeName = (batchCode) => async (dispatch) => {
 
 export const getLoadType = (batchCode) => async (dispatch) => {
   try {
-    const loadType = await axios.get(`${url}/loadtypes?batchcode=${batchCode}`);
-    dispatch({ type: FETCH_ALL_LOAD_TYPE, payload: loadType.data });
-  } catch (error) {
-    console.log(error.message);
-  }
-};
-
-export const getAllFilters = (batchCode) => async (dispatch) => {
-  try {
-    const filters = await axios.get(`${url}/filter?batchcode=${batchCode}`);
-    dispatch({ type: FETCH_ALL_FILTERS, payload: filters.data });
+    const loadType = LoadType;
+    dispatch({ type: FETCH_ALL_LOAD_TYPE, payload: loadType });
   } catch (error) {
     console.log(error.message);
   }

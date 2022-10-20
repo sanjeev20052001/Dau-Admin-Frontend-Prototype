@@ -36,3 +36,13 @@
     transform: rotate(360deg);
   }
 } */
+
+
+.p-datatable-wrapper{
+  max-height: 66vh !important;
+}
+
+.wrapper{
+  height: 100vh;
+  overflow: hidden;
+}

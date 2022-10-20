@@ -7,9 +7,11 @@ import HeaderComponent from './components/header';
 function App() {
   return (
     <div className="App">
+      <div className="wrapper">
       <HeaderComponent />
       <DropdownDemo />
       <Table />
+      </div>
     </div>
   );
 }

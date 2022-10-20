@@ -2,14 +2,14 @@ $defaultmargin: 5px;
 $defaultFilterWidth: 18rem;
 .card{
     align-items: center;
-    border-style: hidden;
 }
 .text{
     margin: $defaultmargin;
     width: $defaultFilterWidth;
 }
 .table{
-    padding: 0px;
+    
+    overflow-x: scroll;
 }
 .button{
     margin: $defaultmargin;
